@@ -5,7 +5,6 @@
  */
 package io.github.herocode.pokepoints.entitiy;
 
-import io.github.herocode.pokepoints.rest.model.Pokemon;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -15,10 +14,10 @@ import com.vividsolutions.jts.geom.Point;
 public class PokePoint
 {
 
-    private int id;
-    private Point point;
-    private int pokemonCp;
-    private int userLevel;
+    private int     id;
+    private Point   point;
+    private int     pokemonCp;
+    private int     userLevel;
 
     public PokePoint(Point point, int pokemonCp, int userLevel)
     {

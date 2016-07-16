@@ -5,7 +5,7 @@
  */
 package io.github.herocode.pokepoints.rest.client;
 
-import io.github.herocode.pokepoints.rest.model.Pokemon;
+import io.github.herocode.pokepoints.entitiy.Pokemon;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
