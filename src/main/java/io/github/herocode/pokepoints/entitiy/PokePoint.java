@@ -6,19 +6,29 @@
 package io.github.herocode.pokepoints.entitiy;
 
 import com.vividsolutions.jts.geom.Point;
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 /**
  *
  * @author kieckegard
  */
-public class PokePoint
-{
+@Entity
+public class PokePoint implements Serializable{
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private int     id;
     private Point   point;
     private int     pokemonCp;
     private int     userLevel;
 
+    public PokePoint() {
+    }
+    
     public PokePoint(Point point, int pokemonCp, int userLevel)
     {
         this.point = point;

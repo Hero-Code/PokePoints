@@ -5,30 +5,63 @@
  */
 package io.github.herocode.pokepoints.entitiy;
 
+import io.github.herocode.pokepoints.rest.client.PokeApiClient;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.persistence.Basic;
+import javax.persistence.CollectionTable;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Lob;
+import javax.persistence.Persistence;
 
 /**
  *
  * @author kieckegard && Victor Hugo
  */
-public class Pokemon {
+@Entity
+public class Pokemon implements Serializable{
 
+    @Id
     private int             id;
     private String          name;
-    private List<String>    types;
-    private BufferedImage   image;
     private String          imageUrl;
+    
+    @ElementCollection
+    @CollectionTable(name = "pokemon_types")
+    private List<String>    types;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] image;
+    
+    @ElementCollection
+    @CollectionTable(name = "pokepoints")
     private List<PokePoint> pokePoints;
 
-    public Pokemon(int id, String name, List<String> types, BufferedImage image, String imageUrl) {
+    public Pokemon() {
+    }
+    
+    public Pokemon(int id, String name, List<String> types, byte[] image, String imageUrl) {
         
         this.id = id;
         this.name = name;
@@ -46,12 +79,14 @@ public class Pokemon {
         this.pokePoints = new ArrayList<>();
     }
 
-    public BufferedImage getImage() {
+    public byte[] getImage() {
 
         if (image == null) {
             
             try {
-                image = ImageIO.read(new URL(imageUrl));
+                BufferedImage read = ImageIO.read(new URL(imageUrl));
+                
+                image = ((DataBufferByte) read.getData().getDataBuffer()).getData();
             } catch (IOException ex) {
                 Logger.getLogger(Pokemon.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -95,5 +130,47 @@ public class Pokemon {
     @Override
     public String toString() {
         return "Pokemon{" + "id=" + id + ", name=" + name + ", types=" + types + ", imageUrl=" + imageUrl + '}';
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setTypes(List<String> types) {
+        this.types = types;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
+    public void setPokePoints(List<PokePoint> pokePoints) {
+        this.pokePoints = pokePoints;
+    }
+    
+    
+    
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+       
+        PokeApiClient pac = new PokeApiClient();
+        
+        Pokemon p = pac.getById(6);
+        
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("PokepointsPU");
+        EntityManager em = emf.createEntityManager();
+        
+        em.getTransaction().begin();
+        em.persist(p);
+        em.getTransaction().commit();
+        em.close();
+                
     }
 }
