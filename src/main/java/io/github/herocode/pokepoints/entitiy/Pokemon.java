@@ -21,8 +21,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.persistence.AssociationOverride;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Basic;
 import javax.persistence.CollectionTable;
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
@@ -31,7 +35,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.Lob;
+import javax.persistence.ManyToMany;
 import javax.persistence.Persistence;
 
 /**
@@ -54,11 +61,15 @@ public class Pokemon implements Serializable{
     @Basic(fetch = FetchType.LAZY)
     private byte[] image;
     
-    @ElementCollection
-    @CollectionTable(name = "pokepoints")
+    @ManyToMany
+    @JoinTable(
+      name="pokemon_pokepoints",
+      joinColumns=@JoinColumn(name="pokemon_id", referencedColumnName="id"),
+      inverseJoinColumns=@JoinColumn(name="pokepoint_id", referencedColumnName="id"))
     private List<PokePoint> pokePoints;
 
     public Pokemon() {
+        
     }
     
     public Pokemon(int id, String name, List<String> types, byte[] image, String imageUrl) {
