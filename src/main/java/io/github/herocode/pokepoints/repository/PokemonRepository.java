@@ -17,56 +17,75 @@ import javax.persistence.Query;
  * @author kieckegard
  */
 public class PokemonRepository implements Repository<Pokemon, Integer> {
-     
-    private final EntityManagerFactory  entityManagerFactory;
-    private final EntityManager         entityManager;
-    
+
+    private EntityManagerFactory entityManagerFactory;
+
     public PokemonRepository() {
+        
         entityManagerFactory = Persistence.createEntityManagerFactory("PokepointsPU");
-        entityManager = entityManagerFactory.createEntityManager();
     }
     
-    /*
-        I'm not closing the entityManager because there'll be moments that we'll call two methods from the same Repository,
-        one after the other, So... once that each method closes the entityManager we'll have a really beautiful NullPointException
-        when we try to call another method. I'm studying some possibilities to make this shit works wonderfully. <3
-    */
+    
     
     @Override
     public void save(Pokemon pokemon) {
+        
+        EntityManager entityManager = getEntityManager();
+        
         entityManager.getTransaction().begin();
         entityManager.persist(pokemon);
         entityManager.getTransaction().commit();
-        //entityManager.close();
+        entityManager.close();
     }
-    
+
     @Override
     public void update(Pokemon pokemon) {
+        
+        EntityManager entityManager = getEntityManager();
+        
         entityManager.getTransaction().begin();
         entityManager.merge(pokemon);
         entityManager.getTransaction().commit();
-        //entityManager.close();
+        entityManager.close();
     }
-    
+
     @Override
     public List<Pokemon> list() {
-        entityManager.getTransaction().begin();   
-        Query query = entityManager.createQuery("SELECT p FROM Pokemon p");   
         
+        EntityManager entityManager = getEntityManager();
+        
+        entityManager.getTransaction().begin();
+        Query query = entityManager.createQuery("SELECT p FROM Pokemon p");
+
         List<Pokemon> pokemons = query.getResultList();
+
+        entityManager.getTransaction().commit();
+        entityManager.close();  
         
-        entityManager.getTransaction().commit();       
-        //entityManager.close();      
         return pokemons;
     }
-    
+
     @Override
     public Pokemon get(Integer id) {
-        entityManager.getTransaction().begin();         
-        Pokemon pokemon =  entityManager.find(Pokemon.class, id);
         
-        entityManager.getTransaction().commit();    
-        //entityManager.close();       
+        EntityManager entityManager = getEntityManager();
+        
+        entityManager.getTransaction().begin();
+        Pokemon pokemon = entityManager.find(Pokemon.class, id);
+
+        entityManager.getTransaction().commit();
+        entityManager.close();       
+        
         return pokemon;
     }
+
+    @Override
+    public EntityManager getEntityManager() {
+
+        EntityManager entityManager;
+        entityManager = entityManagerFactory.createEntityManager();
+        
+        return entityManager;
+    }
+    
 }

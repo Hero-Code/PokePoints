@@ -6,6 +6,7 @@
 package io.github.herocode.pokepoints.repository;
 
 import java.util.List;
+import javax.persistence.EntityManager;
 
 /**
  *
@@ -15,8 +16,14 @@ import java.util.List;
  */
 public interface Repository<T,I>
 {
+    
+    EntityManager getEntityManager();
+    
     void save(T obj);
+    
     void update(T obj);
+    
     T get(I obj);
+    
     List<T> list();
 }
